@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
-from nlp_trainer.component.model.embedding.rope import RotaryPositionalEmbedding
-from nlp_trainer.component.model.titans.module.attention import MultiHeadAttention
-from nlp_trainer.component.model.titans.module.memory import LongTermMemory
-from nlp_trainer.component.model.norm.layer import LayerNorm
+from nlp_trainer.component.model.module.embedding.rope import RotaryPositionalEmbedding
+from nlp_trainer.component.model.module.attention.multihead import MultiHeadAttention
+from nlp_trainer.component.model.module.memory.mlp import LongTermMemory
+from nlp_trainer.component.model.module.norm import LayerNorm
 
 
 class MACBlock(nn.Module):
@@ -13,6 +13,7 @@ class MACBlock(nn.Module):
         num_heads: int,
         ff_dim: int,
         persistent_memory_length: int,
+        positional_encoder: nn.Module,
     ):
         super(MACBlock, self).__init__()
 
@@ -24,11 +25,7 @@ class MACBlock(nn.Module):
         )
         self.memory = LongTermMemory(hidden_dim)
 
-        self.positional_encoder = RotaryPositionalEmbedding(
-            self.hidden_dim // self.num_heads,
-            max_seq_len=persistent_memory_length + 12800,
-            theta=10000,
-        )
+        self.positional_encoder = positional_encoder
 
         self.attention = MultiHeadAttention(
             num_heads, hidden_dim, self.positional_encoder
@@ -97,9 +94,15 @@ class MAC(nn.Module):
 
         self.embedding = nn.Embedding(vocab_size, hidden_dim)
 
+        positional_encoder = RotaryPositionalEmbedding(
+            hidden_dim // num_heads,
+            max_seq_len=persistent_memory_length + 12800,
+            theta=10000,
+        )
+
         self.blocks = nn.ModuleList(
             [
-                MACBlock(hidden_dim, num_heads, ff_dim, persistent_memory_length)
+                MACBlock(hidden_dim, num_heads, ff_dim, persistent_memory_length, positional_encoder)
                 for _ in range(num_blocks)
             ]
         )
