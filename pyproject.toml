@@ -1,5 +1,5 @@
 [project]
-name = "pytorch-framework"
+name = "nlp_trainer"
 version = "0.1.0"
 description = ""
 authors = [
@@ -14,3 +14,5 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
 torch = "^2.6.0"
+torchinfo = "^1.8.0"
+numpy = "^2.2.4"
