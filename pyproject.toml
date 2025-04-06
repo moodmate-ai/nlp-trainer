@@ -16,3 +16,9 @@ build-backend = "poetry.core.masonry.api"
 torch = "^2.6.0"
 torchinfo = "^1.8.0"
 numpy = "^2.2.4"
+datasets = "^3.5.0"
+pytest = "^8.3.5"
+
+[tool.poetry.group.dev.dependencies]
+ipykernel = "^6.29.5"
+
