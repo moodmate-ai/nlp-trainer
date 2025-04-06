@@ -1,10 +1,11 @@
-import torch
 import torch.nn as nn
 from torch.optim import Optimizer
 from torch.utils.data import DataLoader
+from nlp_trainer.core.port.model import NLPModel
+
 
 class LanguageModelingUsecase:
-    def __init__(self, model: nn.Module, optimizer: Optimizer):
+    def __init__(self, model: NLPModel, optimizer: Optimizer):
         self.model = model
         self.optimizer = optimizer
 
@@ -12,7 +13,10 @@ class LanguageModelingUsecase:
         self.model.train()
         for batch in train_loader:
             self.optimizer.zero_grad()
-            self.model.forward(batch)
+
+            # output = self.model.train_step(batch)
+
+            ## need converter: output -> loss fn input
             self.optimizer.step()
 
     def evaluate(self, val_loader: DataLoader):
