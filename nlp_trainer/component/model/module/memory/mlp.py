@@ -34,20 +34,13 @@ class TitansMlpMemory(nn.Module):
 
     def forward(
         self, 
-        x: torch.Tensor,
-        value: Optional[torch.Tensor] = None,
+        x: torch.Tensor
     ):
         """
         x: could be key or query
         - used for expecting value
-        
-        if value is given, then returns surprise, which can be used for updating memory parameter.
         """
         expected_value = self.neural_net(x)
-        if value is None:
-            return expected_value
         
-        surprise = torch.norm(expected_value - value, p=2, dim=-1)
-        surprise = surprise.sum()
-        return surprise
+        return expected_value
         
