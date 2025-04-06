@@ -1,8 +1,7 @@
 import torch
 import torch.nn as nn
-from typing import Optional
 
-class QKVCreator(nn.Module):
+class MultiHeadQKVCreator(nn.Module):
     
     def __init__(
         self,
@@ -10,7 +9,7 @@ class QKVCreator(nn.Module):
         hidden_dim: int,
         positional_encoder: nn.Module,
     ):
-        super(QKVCreator, self).__init__()
+        super(MultiHeadQKVCreator, self).__init__()
         
         self.num_heads = num_heads
         self.head_dim = hidden_dim // num_heads
@@ -24,10 +23,24 @@ class QKVCreator(nn.Module):
     def forward(
         self,
         x: torch.Tensor,
-        cache_key: Optional[torch.Tensor] = None,
-        cache_value: Optional[torch.Tensor] = None
-    )-> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
+        cache_key: torch.Tensor,
+        cache_value: torch.Tensor
+    )-> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+        """
+        
+        cache_key: (BATCH_SIZE, CACHE_LEN, NUM_HEADS, HEAD_DIM)
+        cache_value: (BATCH_SIZE, CACHE_LEN, NUM_HEADS, HEAD_DIM)
+        
+        returns:
+            q: (BATCH_SIZE, NUM_HEADS, SEQ_LEN, HEAD_DIM)
+            k: (BATCH_SIZE, NUM_HEADS, SEQ_LEN + cache_length, HEAD_DIM)
+            v: (BATCH_SIZE, NUM_HEADS, SEQ_LEN + cache_length, HEAD_DIM)
+        """
         assert len(x.shape) == 3
+        assert len(cache_key.shape) == 4
+        assert len(cache_value.shape) == 4
+        
+        
         BATCH_SIZE, SEQ_LEN, HIDDEN_DIM = x.shape
 
         ### 1. linear projection
@@ -43,17 +56,12 @@ class QKVCreator(nn.Module):
         ### 2. positional encoding
         q = self.positional_encoder(q).transpose(1, 2)
 
-        if cache_key is not None and cache_value is not None:
-            cache_k, cache_v = cache
-            k = self.positional_encoder(k, offset=cache_k.shape[1])
-
-            k = torch.cat((cache_k, k), dim=1)
-            v = torch.cat((cache_v, v), dim=1)
-
-            cache = (k, v)
+        k = self.positional_encoder(k, offset=cache_key.shape[1])
+        
+        k = torch.cat((cache_key, k), dim=1)
+        v = torch.cat((cache_value, v), dim=1)
 
         k, v = k.transpose(1, 2), v.transpose(1, 2)
         
-        assert q.shape == (BATCH_SIZE, self.num_heads, SEQ_LEN, self.head_dim)
-        
         return q, k, v
+        
