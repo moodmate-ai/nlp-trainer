@@ -6,7 +6,7 @@ BATCH = TypeVar("BATCH")
 MODEL_INPUT = TypeVar("MODEL_INPUT")
 
 
-class DataToModelStrategy(ABC, Generic[BATCH, MODEL_INPUT]):
+class ModelInputStrategy(ABC, Generic[BATCH, MODEL_INPUT]):
     @abstractmethod
     def execute(self, batch: BATCH) -> MODEL_INPUT:
         pass

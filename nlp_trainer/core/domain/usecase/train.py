@@ -3,8 +3,8 @@ from nlp_trainer.core.domain.port.dataloader import Dataloader
 from nlp_trainer.core.domain.port.model import NLPModel
 from nlp_trainer.core.domain.registry.strategy import StrategyRegistry
 from nlp_trainer.core.domain.entity.strategy import StrategyType
-from nlp_trainer.core.domain.strategy.data_to_model import DataToModelStrategy
-from nlp_trainer.core.domain.strategy.model_to_loss import ModelToLossStrategy
+from nlp_trainer.core.domain.strategy.model import ModelInputStrategy
+from nlp_trainer.core.domain.strategy.loss import LossInputStrategy
 from nlp_trainer.core.domain.port.loss import LossFunction
 
 
@@ -19,21 +19,21 @@ class TrainUsecase:
         self.model = model
         self.optimizer = optimizer
         self.loss_fn = loss_fn
-        self.input_strategy: DataToModelStrategy = strategy_registry.get_strategy(
-            StrategyType.DATA_TO_MODEL_INPUT
+        self.model_input_strategy: ModelInputStrategy = strategy_registry.get_strategy(
+            StrategyType.MODEL_INPUT
         )
-        self.output_strategy: ModelToLossStrategy = strategy_registry.get_strategy(
-            StrategyType.MODEL_OUTPUT_TO_LOSS_INPUT
+        self.loss_input_strategy: LossInputStrategy = strategy_registry.get_strategy(
+            StrategyType.LOSS_INPUT
         )
 
     def execute(self, train_loader: Dataloader):
         for batch in train_loader:
             self.optimizer.zero_grad()
 
-            x = self.input_strategy.execute(batch)
+            x = self.model_input_strategy.execute(batch)
             y = self.model.train_step(x)
 
-            y = self.output_strategy.execute(y)
+            y = self.loss_input_strategy.execute(batch, y)
 
             loss = self.loss_fn.calculate_loss(y)
 

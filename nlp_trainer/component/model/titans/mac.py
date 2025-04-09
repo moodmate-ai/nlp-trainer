@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 from nlp_trainer.component.model.titans.block.mac import MACBlock
 from typing import Optional, TypedDict
-from nlp_trainer.core.port.model import NLPModel
-from nlp_trainer.core.entity.model import NLPModelType
+from nlp_trainer.core.domain.port.model import NLPModel
+from nlp_trainer.core.domain.entity.model import NLPModelType
 
 
 class MACInput(TypedDict):
@@ -86,7 +86,7 @@ class MAC(NLPModel[MACInput, MACOutput], nn.Module):
 
         return x, new_cache_key, new_cache_value, mem_losses
 
-    def get_model_type(self) -> NLPModelType:
+    def get_type(self) -> NLPModelType:
         return NLPModelType.TITANS_MAC
 
     def train_step(self, batch: MACInput) -> MACOutput:
