@@ -14,6 +14,8 @@ class MACBlock(nn.Module):
         num_heads: int,
         ff_dim: int,
         persistent_memory_length: int,
+        memory_num_layers: int = 2,
+        temperature: float = 1.0,
     ):
         super(MACBlock, self).__init__()
 
@@ -24,7 +26,7 @@ class MACBlock(nn.Module):
             torch.randn(1, persistent_memory_length, hidden_dim)
         )
         self.memory = TitansMlpMemory(
-            num_layers=2, hidden_dim=hidden_dim, ff_dim=hidden_dim * 2
+            num_layers=memory_num_layers, hidden_dim=hidden_dim, ff_dim=hidden_dim * 2
         )
 
         self.positional_encoder = RotaryPositionalEmbedding(
@@ -37,7 +39,7 @@ class MACBlock(nn.Module):
             num_heads, hidden_dim, self.positional_encoder
         )
 
-        self.attention = MultiHeadAttention(num_heads, hidden_dim)
+        self.attention = MultiHeadAttention(num_heads, hidden_dim, temperature)
 
         self.layer_norm1 = LayerNorm(hidden_dim)
         self.layer_norm2 = LayerNorm(hidden_dim)

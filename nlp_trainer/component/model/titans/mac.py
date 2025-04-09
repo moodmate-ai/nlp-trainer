@@ -8,8 +8,8 @@ from nlp_trainer.core.domain.entity.model import NLPModelType
 
 class MACInput(TypedDict):
     x: torch.Tensor
-    cache_key: Optional[list[torch.Tensor]]
-    cache_value: Optional[list[torch.Tensor]]
+    cache_key: Optional[list[torch.Tensor]] = None
+    cache_value: Optional[list[torch.Tensor]] = None
 
 
 class MACOutput(TypedDict):
@@ -26,8 +26,10 @@ class MAC(NLPModel[MACInput, MACOutput], nn.Module):
         num_heads: int,
         ff_dim: int,
         persistent_memory_length: int,
+        memory_num_layers: int,
         num_blocks: int,
         vocab_size: int,
+        temperature: float = 1.0,
     ):
         super(MAC, self).__init__()
 
@@ -38,7 +40,14 @@ class MAC(NLPModel[MACInput, MACOutput], nn.Module):
 
         self.blocks = nn.ModuleList(
             [
-                MACBlock(hidden_dim, num_heads, ff_dim, persistent_memory_length)
+                MACBlock(
+                    hidden_dim=hidden_dim,
+                    num_heads=num_heads,
+                    ff_dim=ff_dim,
+                    persistent_memory_length=persistent_memory_length,
+                    memory_num_layers=memory_num_layers,
+                    temperature=temperature,
+                )
                 for _ in range(num_blocks)
             ]
         )
@@ -91,7 +100,7 @@ class MAC(NLPModel[MACInput, MACOutput], nn.Module):
 
     def train_step(self, batch: MACInput) -> MACOutput:
         x, cache_key, cache_value, mem_losses = self.forward(
-            batch["x"], batch["cache_key"], batch["cache_value"]
+            batch["x"], batch.get("cache_key", None), batch.get("cache_value", None)
         )
         return MACOutput(
             x=x, cache_key=cache_key, cache_value=cache_value, mem_losses=mem_losses
@@ -99,7 +108,7 @@ class MAC(NLPModel[MACInput, MACOutput], nn.Module):
 
     def predict_step(self, batch: MACInput) -> MACOutput:
         x, cache_key, cache_value, mem_losses = self.forward(
-            batch["x"], batch["cache_key"], batch["cache_value"]
+            batch["x"], batch.get("cache_key", None), batch.get("cache_value", None)
         )
         return MACOutput(
             x=x, cache_key=cache_key, cache_value=cache_value, mem_losses=mem_losses
