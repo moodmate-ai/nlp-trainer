@@ -1,14 +1,14 @@
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic
 import torch
-from nlp_trainer.core.entity.loss import LossFunctionType
+from nlp_trainer.core.domain.entity.loss import LossFunctionType
 
 T = TypeVar("T")
 
 
 class LossFunction(Generic[T], ABC):
     @abstractmethod
-    def get_loss_function_type(self) -> LossFunctionType:
+    def get_type(self) -> LossFunctionType:
         pass
 
     @abstractmethod
