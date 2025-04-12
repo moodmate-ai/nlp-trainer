@@ -22,3 +22,12 @@ tokenizer = LlamaTokenizerFast.from_pretrained(
 
 len(tokenizer)
 ```
+
+# How to structure the project?
+- usecases
+    - train
+    - eval
+    - infer
+
+
+250,000건 마다 파라미터 저장 -> 하루마다
