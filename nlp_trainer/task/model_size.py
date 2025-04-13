@@ -1,24 +1,10 @@
 import torch
 from nlp_trainer.component.model.titans.mac import MAC, MACInput
-from nlp_trainer.component.dataloader.huggingface import HuggingFaceDataLoader
-from nlp_trainer.component.tokenizer.llama import LlamaTokenizer
 from nlp_trainer.component.loss.perplexity import PerplexityLoss, PerplexityLossInput
 import time
 
 
 def main():
-    dataloader = HuggingFaceDataLoader(
-        path="HuggingFaceFW/fineweb-edu",
-        name="CC-MAIN-2024-10",
-        split="train",
-        streaming=True,
-        batch_size=5,
-        num_workers=4,
-        pin_memory=True,
-    ).get_batch_iterator()
-
-    tokenizer = LlamaTokenizer()
-
     # model = MAC(
     #     hidden_dim=768,
     #     num_heads=12,
@@ -32,7 +18,7 @@ def main():
     model = MAC(
         hidden_dim=512,
         num_heads=8,
-        ff_dim=512,
+        ff_dim=1024,
         persistent_memory_length=32,
         num_blocks=12,
         vocab_size=32000,
@@ -45,24 +31,11 @@ def main():
     optimizer = torch.optim.AdamW(model.parameters(), lr=4e-4)
 
     max_iteration = 10000
-    for idx, batch in enumerate(dataloader):
+    for idx in range(max_iteration):
         time_start = time.time()
         optimizer.zero_grad()
 
-        batch = batch["text"]
-        x = []
-
-        for item in batch:
-            item = tokenizer.encode(item)
-            if len(item) > 768:
-                item = item[:768]
-
-            x.append(item)
-
-        min_seq_len = min(len(item) for item in x)
-        x = [item[:min_seq_len] for item in x]
-
-        x = torch.tensor(x, dtype=torch.long, device="cuda:0")
+        x = torch.randint(0, 32000, (5, 768), device="cuda:0")
 
         mac_input = MACInput(x=x)
         mac_output = model.train_step(mac_input)
