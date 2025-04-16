@@ -7,3 +7,11 @@ class LlamaTokenizer:
 
     def encode(self, text: str) -> list[int]:
         return self.tokenizer.encode(text)
+
+    def decode(self, ids: list[int]) -> str:
+        return self.tokenizer.decode(ids)
+
+
+if __name__ == "__main__":
+    tokenizer = LlamaTokenizer()
+    print(tokenizer.encode("Hello, world!"))

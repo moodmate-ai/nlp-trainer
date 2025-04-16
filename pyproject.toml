@@ -18,6 +18,8 @@ torchinfo = "^1.8.0"
 numpy = "^2.2.4"
 datasets = "^3.5.0"
 pytest = "^8.3.5"
+transformers = "^4.51.1"
+wandb = "^0.19.9"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"
