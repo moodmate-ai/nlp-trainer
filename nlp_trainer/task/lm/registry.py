@@ -1,14 +1,12 @@
 from nlp_trainer.core.domain.entity.loss import LossFunctionType
 import torch
-from nlp_trainer.component.loss.perplexity import PerplexityLoss, PerplexityLossInput
-from nlp_trainer.component.loss.zero import ZeroLoss, ZeroLossInput
+from nlp_trainer.component.loss.perplexity import PerplexityLossInput
+from nlp_trainer.component.loss.zero import ZeroLossInput
 from nlp_trainer.core.domain.registry.train import TrainRegistry
-from nlp_trainer.component.dataloader.huggingface import HuggingFaceDataLoader
 from nlp_trainer.core.domain.strategy.model import ModelInputStrategy
 from nlp_trainer.core.domain.strategy.loss import LossInputStrategy
 from nlp_trainer.component.tokenizer.llama import LlamaTokenizer
-from nlp_trainer.component.model.titans.mac import MAC, MACInput, MACOutput
-from nlp_trainer.core.domain.usecase.train import TrainUsecase
+from nlp_trainer.component.model.titans.mac import MACInput, MACOutput
 
 
 class MACInputStrategy(ModelInputStrategy):
@@ -102,43 +100,3 @@ class LanguageModelingRegistry(TrainRegistry):
         self, loss_fn_type: LossFunctionType
     ) -> LossInputStrategy:
         return self._loss_input_strategy[loss_fn_type]
-
-
-def main():
-    dataloader = HuggingFaceDataLoader(
-        "HuggingFaceFW/fineweb-edu",
-        "CC-MAIN-2024-10",
-        "train",
-        streaming=True,
-        batch_size=5,
-        num_workers=4,
-        pin_memory=True,
-    ).get_batch_iterator()
-
-    registry = LanguageModelingRegistry(device="cuda:0", tokenizer=LlamaTokenizer())
-    model = MAC(
-        hidden_dim=512,
-        num_heads=8,
-        ff_dim=512,
-        persistent_memory_length=32,
-        memory_num_layers=2,
-        num_blocks=12,
-        vocab_size=32000,
-    ).to("cuda:0")
-
-    loss_fn_list = [PerplexityLoss().to("cuda:0"), ZeroLoss()]
-    optimizer = torch.optim.AdamW(model.parameters(), lr=4e-4)
-
-    usecase = TrainUsecase(
-        model=model,
-        optimizer=optimizer,
-        loss_fn_list=loss_fn_list,
-        train_registry=registry,
-    )
-
-    for epoch in range(10):
-        usecase.execute(dataloader)
-
-
-if __name__ == "__main__":
-    main()
