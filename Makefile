@@ -12,3 +12,6 @@ exec-model-size:
 
 exec-language-modeling:
 	poetry run python -m nlp_trainer.task.titans.language_modeling
+
+exec-logging:
+	poetry run python -m nlp_trainer.task.logging

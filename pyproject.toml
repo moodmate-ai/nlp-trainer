@@ -20,6 +20,9 @@ datasets = "^3.5.0"
 pytest = "^8.3.5"
 transformers = "^4.51.1"
 wandb = "^0.19.9"
+python-dotenv = "^1.1.0"
+dependency-injector = "^4.46.0"
+pydantic-settings = "^2.8.1"
 
 [tool.poetry.group.dev.dependencies]
 ipykernel = "^6.29.5"
