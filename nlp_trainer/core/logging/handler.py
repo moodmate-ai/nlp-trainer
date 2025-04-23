@@ -37,9 +37,9 @@ class WandbHandler(logging.Handler):
         try:
             data = self.format(record)
 
-            if data is not None and "wandb" in data.keys():
-                assert isinstance(data["wandb"], dict)
-                self.wandb_run.log(data["wandb"])
+            if data is not None:
+                assert isinstance(data, dict)
+                self.wandb_run.log(data)
 
         except Exception:
             self.handleError(record)
