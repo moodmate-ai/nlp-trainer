@@ -1,0 +1,8 @@
+**/.DS_Store
+__pycache__
+.python-version
+.env
+wandb/*
+
+.pytest_cache/*
+.ruff_cache/*

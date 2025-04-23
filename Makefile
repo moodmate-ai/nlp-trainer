@@ -18,3 +18,7 @@ exec-lm:
 
 exec-logging:
 	poetry run python -m nlp_trainer.task.logging
+
+exec-docker-lm:
+	# sudo docker build -t nlp-trainer-lm .
+	sudo docker run --gpus all --shm-size=50gb -it -v ./.env:/app/.env nlp-trainer-lm poetry run python -m nlp_trainer.task.lm.app
