@@ -45,13 +45,14 @@ class TrainUsecase:
                 loss = loss_fn.calculate_loss(loss_input)
                 loss_list.append(loss)
 
+                loss_type = loss_fn.get_type()
+                loss_value = loss.detach().cpu().numpy().tolist()
                 logger.info(
                     {
                         "wandb": {
                             "epoch": epoch,
                             "batch_num": batch_num,
-                            "loss_type": loss_fn.get_type(),
-                            "loss_value": loss.detach().numpy(),
+                            f"loss-{loss_type}": loss_value,
                         }
                     }
                 )

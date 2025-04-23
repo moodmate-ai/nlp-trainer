@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 class LanguageModelingConfig(TypedDict):
-    max_epoch: int = 10
+    max_epoch: int
 
 
 class LanguageModelingApplication(Application):
@@ -61,11 +61,11 @@ class LanguageModelingApplication(Application):
         ## Log config
         logger.info({"language modeling config": self.config})
 
-        for epoch in range(0, self.config.max_epoch):
+        for epoch in range(0, self.config["max_epoch"]):
             self.usecase.execute(epoch, self.dataloader)
 
 
 if __name__ == "__main__":
-    config = LanguageModelingConfig()
+    config = LanguageModelingConfig(max_epoch=10)
     app = LanguageModelingApplication(config=config)
     app.run()

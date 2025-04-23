@@ -10,8 +10,11 @@ exec-inference:
 exec-model-size:
 	poetry run python -m nlp_trainer.task.model_size
 
-exec-language-modeling:
-	poetry run python -m nlp_trainer.task.titans.language_modeling
+install:
+	poetry install
+
+exec-lm:
+	poetry run python -m nlp_trainer.task.lm.app
 
 exec-logging:
 	poetry run python -m nlp_trainer.task.logging
