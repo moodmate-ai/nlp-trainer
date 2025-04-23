@@ -27,7 +27,8 @@ class TrainUsecase:
             train_registry.get_model_input_strategy()
         )
 
-    def execute(self, train_loader: Dataloader):
+    def execute(self, epoch: int, train_loader: Dataloader):
+        batch_num = 0
         for batch in train_loader:
             self.optimizer.zero_grad()
 
@@ -44,6 +45,19 @@ class TrainUsecase:
                 loss = loss_fn.calculate_loss(loss_input)
                 loss_list.append(loss)
 
+                logger.info(
+                    {
+                        "wandb": {
+                            "epoch": epoch,
+                            "batch_num": batch_num,
+                            "loss_type": loss_fn.get_type(),
+                            "loss_value": loss.detach().numpy(),
+                        }
+                    }
+                )
+
             loss = torch.sum(torch.stack(loss_list))
             loss.backward()
             self.optimizer.step()
+
+            batch_num += 1
