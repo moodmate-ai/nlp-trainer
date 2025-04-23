@@ -1,4 +1,4 @@
-from nlp_trainer.core.app import Application
+from nlp_trainer.di.app import Application
 from logging import getLogger
 
 logger = getLogger(__name__)

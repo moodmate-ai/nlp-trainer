@@ -1,5 +1,5 @@
 from nlp_trainer.core.logging.handler import WandbHandler
-from nlp_trainer.di.config import SystemConfig
+from nlp_trainer.di.config import BaseConfig
 from nlp_trainer.core.logging.base import setup_logging
 import logging
 import sys
@@ -7,7 +7,7 @@ import sys
 
 class Application:
     def __init__(self):
-        config = SystemConfig()
+        config = BaseConfig()
         ### Logging
         wandb_handler = WandbHandler(
             config.wandb_key,

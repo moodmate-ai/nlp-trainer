@@ -1,7 +1,7 @@
 from pydantic_settings import BaseSettings
 
 
-class Config(BaseSettings):
+class BaseConfig(BaseSettings):
     wandb_key: str
     wandb_project_name: str
     wandb_entity: str
